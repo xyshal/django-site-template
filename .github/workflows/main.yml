@@ -12,10 +12,3 @@ jobs:
       - uses: actions/checkout@v2
       - name: Test Everything
         run: python test.py
-  mac:
-    runs-on: macos-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Test Everything
-        run: python3 test.py
-   
