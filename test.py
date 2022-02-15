@@ -73,11 +73,20 @@ time.sleep(10)
 print("Running tests...")
 # -----------------------
 # Run a sanity check
-wgetOutput = "testindex.html"
-if (os.path.exists(wgetOutput)):
-    os.remove(wgetOutput)
-subprocess.check_call(f"wget -O {wgetOutput} http://127.0.0.1:8000", shell=True)
-os.remove(wgetOutput)
+requestOutput = "testindex.html"
+requestCmd = ""
+if (shutil.which("wget") is not None):
+  requestCmd = f"wget -O {requestOutput} http://127.0.0.1:8000"
+elif (shutil.which("curl") is not None):
+  requestCmd = f"curl -o {requestOutput} http://127.0.0.1:8000 --connect-timeout 5"
+else:
+  # TODO: Use the python requests library in this case?
+  raise Exception("Don't know how to make a request")
+
+if (os.path.exists(requestOutput)):
+    os.remove(requestOutput)
+subprocess.check_call(requestCmd, shell=True)
+os.remove(requestOutput)
 
 # TODO: Run a unit test (through a docker exec?)
 
