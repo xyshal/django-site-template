@@ -38,7 +38,7 @@ subprocess.check_call(f"docker run --user={uid}:{gid} -v {os.getcwd()}:/var/www 
 print("Copying test site resources...")
 # -------------------------------------
 for f in ["settings.py", "urls.py"]:
-    shutil.copyfile(os.path.join("resources", "site", f), os.path.join("testsite", f))
+    shutil.copyfile(os.path.join("resources", "site", f), os.path.join("testsite", "testsite", f))
 
 for f in ["urls.py", "models.py", "views.py"]:
     shutil.copyfile(os.path.join("resources","site",f"testapp-{f}"), os.path.join("testsite","testapp",f))
@@ -52,14 +52,16 @@ os.mkdir(os.path.join("testsite", "testapp", "static"))
 os.mkdir(os.path.join("testsite", "testapp", "static", "css"))
 shutil.copyfile(os.path.join("resources", "site", "styles.css"), os.path.join("testsite", "testapp", "static", "css", "styles.css"))
 
+# TODO: Maybe this here is the time to split the file; put this file in resources and call files in the root that would actually be used in production.
+
 # ------------------------------
 print("Updating environment...")
 # ------------------------------
-# TODO: Looks like this doesn't work, gotta make an .env file (can we make one
-# that is called test.env and point to it on the command line? if so we can
-# just commit that to resources/)
-os.environ["DJANGO_SECRET_KEY"] = "1234"
-os.environ["DJANGO_DEBUG"] = "True"
+# TODO: Why doesn't pointing to a file with env_file work in the docker-compose?
+environmentFile = ".env"
+if (os.path.exists(environmentFile)):
+    os.remove(environmentFile)
+shutil.copyfile(os.path.join("resources", "change.env"), environmentFile)
 
 # -----------------------------
 print("Spawning containers...")
@@ -98,6 +100,7 @@ print("Cleaning up...")
 subprocess.check_call("docker-compose down", shell=True)
 shutil.rmtree(siteDir)
 shutil.rmtree(emptyDir)
+os.remove(environmentFile)
 for cmd in ["docker container prune -f",
             "docker image rm tmp-deleteme:latest site:latest -f"]:
   subprocess.check_call(cmd, shell=True)

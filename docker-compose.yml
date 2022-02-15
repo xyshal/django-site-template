@@ -8,10 +8,10 @@ services:
     image: site:latest
     restart: "unless-stopped"
     environment:
-      - SECRET_KEY=${DJANGO_SECRET_KEY}
+      - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
       - DJANGO_DEBUG=${DJANGO_DEBUG}
     # TODO: Is it always safe to do this?  Is it sane?
-    command: /bin/bash -c "cd /var/www && python manage.py makemigrations && python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
+    command: /bin/bash -c "echo $DJANGO_SECRET_KEY && cd /var/www && python manage.py makemigrations && python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
     ports:
       - 8000:8000
 
