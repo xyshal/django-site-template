@@ -18,12 +18,13 @@ os.mkdir(emptyDir)
 # -------------------------------------
 print("Generating test django site...")
 # -------------------------------------
+user = subprocess.check_output(["id","-un"]).rstrip().decode("UTF-8")
 uid = subprocess.check_output(["id","-u"]).rstrip().decode("UTF-8")
 gid = subprocess.check_output(["id","-g"]).rstrip().decode("UTF-8")
 
 # We could just generate the site on the local machine, but doing it in a
 # container ensures that our version of django matches.
-subprocess.check_call(f"docker build -f environments/site/Dockerfile {emptyDir} -t tmp-deleteme --build-arg UID={uid} --build-arg GID={gid}", shell=True)
+subprocess.check_call(f"docker build -f environments/site/Dockerfile {emptyDir} -t tmp-deleteme --build-arg UNAME={user} --build-arg UID={uid} --build-arg GID={gid}", shell=True)
 
 siteGenerationCommands = ["cd /var/www",
                           "pip install django",
@@ -52,8 +53,6 @@ os.mkdir(os.path.join("testsite", "testapp", "static"))
 os.mkdir(os.path.join("testsite", "testapp", "static", "css"))
 shutil.copyfile(os.path.join("resources", "site", "styles.css"), os.path.join("testsite", "testapp", "static", "css", "styles.css"))
 
-# TODO: Maybe this here is the time to split the file; put this file in resources and call files in the root that would actually be used in production.
-
 # ------------------------------
 print("Updating environment...")
 # ------------------------------
@@ -62,14 +61,29 @@ environmentFile = ".env"
 if (os.path.exists(environmentFile)):
     os.remove(environmentFile)
 shutil.copyfile(os.path.join("resources", "change.env"), environmentFile)
+with open(environmentFile, "a") as f:
+    f.write(f"UNAME={user}\n")
+    f.write(f"UID={uid}\n")
+    f.write(f"GID={gid}\n")
 
 # -----------------------------
 print("Spawning containers...")
 # -----------------------------
 subprocess.check_call("docker-compose up -d", shell=True)
 
-# TODO: Parse docker-compose logs instead
+# TODO: When the container gets a new enough version of docker, can just use
+# `docker compose up -d --wait`
 time.sleep(10)
+
+# TODO: Maybe this here is the time to split the file; put this file in resources and call files in the root that would actually be used in production.
+
+# TODO: Variable-ize "site:latest"
+container = ""
+containers = subprocess.check_output(["docker","container", "ls"]).rstrip().decode("UTF-8")
+for line in containers.split("\n"):
+    if "site:latest" in line:
+        container = line.split(" ")[0]
+assert container != ""
 
 # -----------------------
 print("Running tests...")
@@ -93,6 +107,17 @@ os.remove(requestOutput)
 # TODO: Run a unit test (through a docker exec?)
 
 # TODO: Run an integration test.
+# TODO: This takes a long time; should we provide a mechanism to cache this container?
+subprocess.check_call(f"docker cp environments/site/install-test-dependencies.sh {container}:/root", shell=True)
+subprocess.check_call(f"docker cp environments/site/launch-vnc.sh {container}:/var/www", shell=True)
+subprocess.check_call(f"docker exec --user root -it {container} /bin/bash /root/install-test-dependencies.sh", shell=True)
+
+subprocess.check_call(f"docker exec -itd {container} /bin/bash /var/www/launch-vnc.sh", shell=True)
+subprocess.check_call(f"docker exec -it {container} pip3 install selenium", shell=True)
+
+subprocess.check_call(f"docker cp test/integration-test.py {container}:/var/www", shell=True)
+subprocess.check_call(f"docker exec -it {container} /bin/bash -c \"DISPLAY=:0 python3 /var/www/integration-test.py\"", shell=True)
+
 
 # ---------------------
 print("Cleaning up...")
