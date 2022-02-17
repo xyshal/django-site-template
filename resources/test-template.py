@@ -110,13 +110,13 @@ os.remove(requestOutput)
 # TODO: This takes a long time; should we provide a mechanism to cache this container?
 subprocess.check_call(f"docker cp environments/site/install-test-dependencies.sh {container}:/root", shell=True)
 subprocess.check_call(f"docker cp environments/site/launch-vnc.sh {container}:/var/www", shell=True)
-subprocess.check_call(f"docker exec --user root -it {container} /bin/bash /root/install-test-dependencies.sh", shell=True)
+subprocess.check_call(f"docker exec --user root {container} /bin/bash /root/install-test-dependencies.sh", shell=True)
 
-subprocess.check_call(f"docker exec -itd {container} /bin/bash /var/www/launch-vnc.sh", shell=True)
-subprocess.check_call(f"docker exec -it {container} pip3 install selenium", shell=True)
+subprocess.check_call(f"docker exec -d {container} /bin/bash /var/www/launch-vnc.sh", shell=True)
+subprocess.check_call(f"docker exec {container} pip3 install selenium", shell=True)
 
 subprocess.check_call(f"docker cp test/integration-test.py {container}:/var/www", shell=True)
-subprocess.check_call(f"docker exec -it {container} /bin/bash -c \"DISPLAY=:0 python3 /var/www/integration-test.py\"", shell=True)
+subprocess.check_call(f"docker exec {container} /bin/bash -c \"DISPLAY=:0 python3 /var/www/integration-test.py\"", shell=True)
 
 
 # ---------------------
