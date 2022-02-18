@@ -41,7 +41,7 @@ print("Copying test site resources...")
 for f in ["settings.py", "urls.py"]:
     shutil.copyfile(os.path.join("resources", "site", f), os.path.join("testsite", "testsite", f))
 
-for f in ["urls.py", "models.py", "views.py"]:
+for f in ["urls.py", "models.py", "views.py", "tests.py"]:
     shutil.copyfile(os.path.join("resources","site",f"testapp-{f}"), os.path.join("testsite","testapp",f))
 
 templatesDir = os.path.join("testsite", "testapp", "templates")
@@ -104,7 +104,8 @@ if (os.path.exists(requestOutput)):
 subprocess.check_call(requestCmd, shell=True)
 os.remove(requestOutput)
 
-# TODO: Run a unit test (through a docker exec?)
+# Run a unit test (through a docker exec?)
+subprocess.check_call(f"docker exec {container} /bin/bash -c \"cd /var/www && python3 manage.py test\"", shell=True)
 
 # TODO: Run an integration test.
 # TODO: This takes a long time; should we provide a mechanism to cache this container?
