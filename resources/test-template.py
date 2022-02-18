@@ -7,10 +7,11 @@ for cmd in ["docker container prune -f",
             "docker image rm tmp-deleteme:latest site:latest -f"]:
   subprocess.check_call(cmd, shell=True)
 
-siteDir = os.path.join(os.getcwd(), "testsite")
 emptyDir = os.path.join(os.getcwd(), "emptydir")
+siteDir = os.path.join(os.getcwd(), "testsite")
+dbDir = os.path.join(os.getcwd(), "db")
 
-for d in [siteDir, emptyDir]:
+for d in [siteDir, emptyDir, dbDir]:
     if (os.path.isdir(d)):
         shutil.rmtree(d)
 os.mkdir(emptyDir)
@@ -65,6 +66,7 @@ with open(environmentFile, "a") as f:
     f.write(f"UNAME={user}\n")
     f.write(f"UID={uid}\n")
     f.write(f"GID={gid}\n")
+    f.write(f"POSTGRES_DATA_DIR={dbDir}")
 
 # -----------------------------
 print("Spawning containers...")
@@ -72,8 +74,9 @@ print("Spawning containers...")
 subprocess.check_call("docker-compose up -d", shell=True)
 
 # TODO: When the container gets a new enough version of docker, can just use
-# `docker compose up -d --wait`
-time.sleep(10)
+# `docker compose up -d --wait` [although not quite now that we need to wait
+# for the database to spin up]
+time.sleep(30)
 
 # -----------------------
 print("Running tests...")
@@ -84,8 +87,9 @@ subprocess.check_call("python3 runtests.py", shell=True)
 print("Cleaning up...")
 # ---------------------
 subprocess.check_call("docker-compose down", shell=True)
-shutil.rmtree(siteDir)
 shutil.rmtree(emptyDir)
+shutil.rmtree(siteDir)
+shutil.rmtree(dbDir)
 os.remove(environmentFile)
 for cmd in ["docker container prune -f",
             "docker image rm tmp-deleteme:latest site:latest -f"]:

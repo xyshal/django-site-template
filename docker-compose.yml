@@ -14,8 +14,27 @@ services:
     environment:
       - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
       - DJANGO_DEBUG=${DJANGO_DEBUG}
+      - DJANGO_POSTGRES_DB=${DJANGO_POSTGRES_DB}
+      - DJANGO_POSTGRES_USER=${DJANGO_POSTGRES_USER}
+      - DJANGO_POSTGRES_PASSWORD=${DJANGO_POSTGRES_PASSWORD}
+
     # TODO: Is it always safe to do this?  Is it sane?
-    command: /bin/bash -c "cd /var/www && python manage.py makemigrations && python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
+    # TODO: How can we better make this wait for the database container to be ready?
+    command: /bin/bash -c "sleep 10 && cd /var/www && python manage.py makemigrations && python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
     ports:
       - 8000:8000
+    depends_on: ["db"]
 
+  db:
+    image: postgres:14-bullseye
+    restart: "unless-stopped"
+    user: ${UID:-root}:${GID:-root}
+    environment:
+      - POSTGRES_DB=${DJANGO_POSTGRES_DB}
+      - POSTGRES_USER=${DJANGO_POSTGRES_USER}
+      - POSTGRES_PASSWORD=${DJANGO_POSTGRES_PASSWORD}
+      - PGDATA=/var/lib/postgresql/data
+    volumes:
+      - ${POSTGRES_DATA_DIR}:/var/lib/postgresql/data
+    ports:
+      - 5432:5432

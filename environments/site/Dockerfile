@@ -33,7 +33,7 @@ USER $UNAME
 ENV PATH=/home/$UNAME/.local/bin:$PATH
 RUN pip3 install --upgrade pip
 # TODO: This is where you would RUN pip3 install -r requirements.txt
-RUN pip3 install django
+RUN pip3 install django psycopg2
 
 # Timestamp the image
 # -------------------
