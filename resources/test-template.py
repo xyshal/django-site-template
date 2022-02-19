@@ -9,9 +9,8 @@ for cmd in ["docker container prune -f",
 
 emptyDir = os.path.join(os.getcwd(), "emptydir")
 siteDir = os.path.join(os.getcwd(), "testsite")
-dbDir = os.path.join(os.getcwd(), "db")
 
-for d in [siteDir, emptyDir, dbDir]:
+for d in [siteDir, emptyDir]:
     if (os.path.isdir(d)):
         shutil.rmtree(d)
 os.mkdir(emptyDir)
@@ -66,7 +65,6 @@ with open(environmentFile, "a") as f:
     f.write(f"UNAME={user}\n")
     f.write(f"UID={uid}\n")
     f.write(f"GID={gid}\n")
-    f.write(f"POSTGRES_DATA_DIR={dbDir}")
 
 # -----------------------------
 print("Spawning containers...")
@@ -91,7 +89,6 @@ print("Cleaning up...")
 subprocess.check_call("docker-compose down", shell=True)
 shutil.rmtree(emptyDir)
 shutil.rmtree(siteDir)
-shutil.rmtree(dbDir)
 os.remove(environmentFile)
 for cmd in ["docker container prune -f",
             "docker image rm tmp-deleteme:latest site:latest -f"]:

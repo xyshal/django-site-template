@@ -28,13 +28,10 @@ services:
   db:
     image: postgres:14-bullseye
     restart: "unless-stopped"
-    user: ${UID:-root}:${GID:-root}
     environment:
       - POSTGRES_DB=${DJANGO_POSTGRES_DB}
       - POSTGRES_USER=${DJANGO_POSTGRES_USER}
       - POSTGRES_PASSWORD=${DJANGO_POSTGRES_PASSWORD}
       - PGDATA=/var/lib/postgresql/data
-    volumes:
-      - ${POSTGRES_DATA_DIR}:/var/lib/postgresql/data
     ports:
       - 5432:5432
