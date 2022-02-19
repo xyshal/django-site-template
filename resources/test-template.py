@@ -78,6 +78,8 @@ subprocess.check_call("docker-compose up -d", shell=True)
 # for the database to spin up]
 time.sleep(30)
 
+subprocess.check_call("docker-compose logs", shell=True)
+
 # -----------------------
 print("Running tests...")
 # -----------------------
