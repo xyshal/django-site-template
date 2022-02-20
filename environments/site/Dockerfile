@@ -19,13 +19,16 @@ RUN apt-get update && apt-get install -yf \
     postgresql-client \
     vim
 
-# Copy site data and set permissions
-# ----------------------------------
+# Create directories and set permissions
+# --------------------------------------
+RUN mkdir -p /var/log/gunicorn
+RUN chown -R $UID /var/log/gunicorn
+RUN chgrp -R $GID /var/log/gunicorn
+
 RUN mkdir -p /var/www
 COPY . /var/www/
 RUN chown -R $UID /var/www
 RUN chgrp -R $GID /var/www
-
 
 # Install Python packages
 # -----------------------
@@ -33,9 +36,5 @@ USER $UNAME
 ENV PATH=/home/$UNAME/.local/bin:$PATH
 RUN pip3 install --upgrade pip
 # TODO: This is where you would RUN pip3 install -r requirements.txt
-RUN pip3 install django psycopg2
-
-# Timestamp the image
-# -------------------
-RUN touch /var/www/image-built-$(date +"%F-%T")
+RUN pip3 install django psycopg2 gunicorn
 
