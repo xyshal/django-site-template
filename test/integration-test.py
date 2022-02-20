@@ -10,7 +10,7 @@ class IntegrationTest(unittest.TestCase):
         self.driver.quit()
 
     def test_example(self):
-        self.driver.get("http://localhost:8000")
+        self.driver.get("http://nginx")
         assert "Test Site" in self.driver.title, self.driver.title
         # TODO: find_element_by_* deprecated, use find_element() instead
         assert "The database has 0 records" in self.driver.find_element_by_id("nRecords").text

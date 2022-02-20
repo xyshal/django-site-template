@@ -33,5 +33,17 @@ services:
       - POSTGRES_USER=${DJANGO_POSTGRES_USER}
       - POSTGRES_PASSWORD=${DJANGO_POSTGRES_PASSWORD}
       - PGDATA=/var/lib/postgresql/data
+    # TODO: This seemed to be necessary to get the site container to access it.  Why?
     ports:
       - 5432:5432
+
+  nginx:
+    build:
+      context: environments/nginx
+      dockerfile: Dockerfile
+    image: nginx-site:latest
+    restart: "unless-stopped"
+    ports:
+      - 80:80
+    depends_on: ["site"]
+

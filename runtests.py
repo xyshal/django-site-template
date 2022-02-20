@@ -21,9 +21,9 @@ assert container != ""
 requestOutput = "testindex.html"
 requestCmd = ""
 if (shutil.which("wget") is not None):
-  requestCmd = f"wget -O {requestOutput} http://127.0.0.1:8000"
+  requestCmd = f"wget -O {requestOutput} http://127.0.0.1"
 elif (shutil.which("curl") is not None):
-  requestCmd = f"curl -o {requestOutput} http://127.0.0.1:8000 --connect-timeout 5"
+  requestCmd = f"curl -o {requestOutput} http://127.0.0.1 --connect-timeout 5"
 else:
   # TODO: Use the python requests library in this case?
   raise Exception("Don't know how to make a request")
