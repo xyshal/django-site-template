@@ -4,6 +4,11 @@ import subprocess
 import time
 
 onGithubActionMachine = os.path.exists(os.path.join("/", "home", "runner"))
+if onGithubActionMachine:
+    print("I think we're on a Github Action build agent")
+else:
+    subprocess.check_call("pwd -P", shell=True)
+    subprocess.check_call("ls -la /home", shell=True)
 
 if not onGithubActionMachine:
     for cmd in ["docker container prune -f",
