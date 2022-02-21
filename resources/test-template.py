@@ -4,11 +4,6 @@ import subprocess
 import time
 
 onGithubActionMachine = os.path.exists(os.path.join("/", "home", "runner"))
-if onGithubActionMachine:
-    print("I think we're on a Github Action build agent")
-else:
-    subprocess.check_call("pwd -P", shell=True)
-    subprocess.check_call("ls -la /home", shell=True)
 
 if not onGithubActionMachine:
     for cmd in ["docker container prune -f",
@@ -41,9 +36,12 @@ subprocess.check_call("docker-compose up -d", shell=True)
 
 # For now, just sleep until everything is probably done with initial setup
 sleepTime = 30 if onGithubActionMachine else 10
-if (os.path.exists(os.path.join("home", "runner"))):
-    time.sleep(30)
-time.sleep(10)
+if onGithubActionMachine:
+    print("I think we're on a github action machine!")
+else:
+    subprocess.check_call("pwd -P", shell=True)
+    subprocess.check_call("ls -la /home", shell=True)
+time.sleep(sleepTime)
 
 subprocess.check_call("docker-compose logs", shell=True)
 
