@@ -4,7 +4,7 @@ import subprocess
 import time
 
 for cmd in ["docker container prune -f",
-            "docker image rm site:latest nginx-site:latest -f"]:
+            "docker image rm example-site:latest example-nginx:latest -f"]:
   subprocess.check_call(cmd, shell=True)
 
 # ------------------------------
@@ -46,6 +46,6 @@ print("Cleaning up...")
 subprocess.check_call("docker-compose down", shell=True)
 os.remove(environmentFile)
 for cmd in ["docker container prune -f",
-            "docker image rm site:latest nginx-site:latest -f"]:
+            "docker image rm example-site:latest example-nginx:latest -f"]:
   subprocess.check_call(cmd, shell=True)
 

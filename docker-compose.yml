@@ -3,13 +3,13 @@ services:
 
   site:
     build:
-      context: testsite
+      context: django
       dockerfile: ../environments/site/Dockerfile
       args:
         UNAME: ${UNAME:-www}
         UID: ${UID:-1000}
         GID: ${GID:-1000}
-    image: site:latest
+    image: example-site:latest
     restart: "unless-stopped"
     environment:
       - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
@@ -41,7 +41,7 @@ services:
     build:
       context: environments/nginx
       dockerfile: Dockerfile
-    image: nginx-site:latest
+    image: example-nginx:latest
     restart: "unless-stopped"
     ports:
       - 80:80
