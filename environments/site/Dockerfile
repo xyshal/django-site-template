@@ -15,9 +15,7 @@ RUN useradd -m -u $UID -g $GID -o -s /bin/bash $UNAME
 # System packages
 # ---------------
 ENV DEBIAN_FRONTEND=noninteractive
-RUN apt-get update && apt-get install -yf \
-    postgresql-client \
-    vim
+RUN apt-get update && apt-get install -yf postgresql-client
 
 # Create directories and set permissions
 # --------------------------------------
