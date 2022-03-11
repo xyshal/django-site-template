@@ -13,7 +13,7 @@ services:
     restart: "unless-stopped"
     environment:
       - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
-      - DJANGO_DEBUG=${DJANGO_DEBUG}
+      - DJANGO_DEBUG=${DJANGO_DEBUG:-False}
       - DJANGO_POSTGRES_DB=${DJANGO_POSTGRES_DB}
       - DJANGO_POSTGRES_USER=${DJANGO_POSTGRES_USER}
       - DJANGO_POSTGRES_PASSWORD=${DJANGO_POSTGRES_PASSWORD}
@@ -43,6 +43,9 @@ services:
       dockerfile: Dockerfile
     image: example-nginx:latest
     restart: "unless-stopped"
+    environment:
+      - GUNICORN_LOGLEVEL=${GUNICORN_LOGLEVEL:-info}
+      - GUNICORN_DEBUG=${GUNICORN_DEBUG:-False}
     ports:
       - 80:80
     depends_on: ["site"]
