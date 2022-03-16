@@ -5,11 +5,6 @@ import time
 
 onGithubActionMachine = os.path.exists(os.path.join("/", "home", "runner"))
 
-if not onGithubActionMachine:
-    for cmd in ["docker container prune -f",
-                "docker image rm example-site:latest example-nginx:latest -f"]:
-      subprocess.check_call(cmd, shell=True)
-
 # ------------------------------
 print("Updating environment...")
 # ------------------------------
@@ -29,7 +24,7 @@ if (not os.path.exists(environmentFile)):
 # -----------------------------
 print("Spawning containers...")
 # -----------------------------
-subprocess.check_call("docker-compose up -d", shell=True)
+subprocess.check_call("docker-compose up --build -d", shell=True)
 # TODO: When the container gets a new enough version of docker, can just use
 # `docker compose up -d --wait` [although not quite now that we need to wait
 # for the database to spin up]
@@ -49,10 +44,4 @@ subprocess.check_call("python3 runtests.py", shell=True)
 print("Cleaning up...")
 # ---------------------
 subprocess.check_call("docker-compose down", shell=True)
-
-if not onGithubActionMachine:
-    os.remove(environmentFile)
-    for cmd in ["docker container prune -f",
-                "docker image rm example-site:latest example-nginx:latest -f"]:
-        subprocess.check_call(cmd, shell=True)
 
