@@ -48,5 +48,6 @@ services:
       - GUNICORN_DEBUG=${GUNICORN_DEBUG:-False}
     ports:
       - 80:80
+      - 443:443
     depends_on: ["site"]
 
