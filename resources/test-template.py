@@ -30,7 +30,7 @@ subprocess.check_call("docker-compose up --build -d", shell=True)
 # for the database to spin up]
 
 # For now, just sleep until everything is probably done with initial setup
-sleepTime = 30 if onGithubActionMachine else 10
+sleepTime = 40 if onGithubActionMachine else 15
 time.sleep(sleepTime)
 
 subprocess.check_call("docker-compose logs", shell=True)
