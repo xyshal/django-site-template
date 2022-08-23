@@ -54,7 +54,6 @@ services:
   pgbackups:
     image: prodrigestivill/postgres-backup-local
     restart: "unless-stopped"
-    user: ${POSTGRES_USER}:${POSTGRES_GROUP}
     links: ["db"]
     depends_on: ["db"]
     environment:
